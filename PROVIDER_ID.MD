@@ -4,19 +4,9 @@ This document outlines the implementation of Health ID authentication which conn
 
 ## 0. Dependencies Required
 
-- **next-auth** version 5+
-
-> **Tip**: Check the latest version before installing:
+- **next-auth** 
 > ```bash
-> npm view next-auth versions --json | tail -5
-> # or simply
-> npm view next-auth version
-> ```
-> Then install with:
-> ```bash
-> npm install next-auth@latest
-> # or specific version
-> npm install next-auth@5.x.x
+> npm install next-auth@5.0.0-beta.30
 > ```
 
 
