@@ -2,6 +2,10 @@
 
 This document outlines the implementation of Health ID authentication which connects to Provider ID to retrieve user profiles. The implementation uses NextAuth.js for session management.
 
+## 0. dependencies require
+- next-auth 5
+
+
 ## 1. Environment Variables (`.env`)
 
 Define the necessary keys for Health ID, Provider ID, and NextAuth.
