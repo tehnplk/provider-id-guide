@@ -26,8 +26,7 @@ PROVIDER_CLIENT_ID=your-provider-client-id
 PROVIDER_CLIENT_SECRET=your-provider-client-secret
 ```
 
-## 2. NextAuth Configuration (`src/authConfig.ts`)
-
+## 2. NextAuth Configuration (`src/authConfig.ts
 Configure `CredentialsProvider` to handle the Provider ID profile. The `authorize` function receives the profile data from the API route and stores it in the session.
 
 ```typescript
@@ -251,4 +250,133 @@ export default async function ProfilePage() {
     </div>
   );
 }
+```
+
+## 7. Route Protection with Middleware (`src/middleware.ts`)
+
+Protect routes using Next.js middleware with NextAuth v5. This ensures unauthenticated users are redirected to the login page.
+
+### Key Concepts
+
+1. **Middleware Location**: For projects using `src/` folder, middleware must be at `src/middleware.ts` (not root)
+2. **Auth Wrapper**: Use `auth()` from NextAuth to wrap middleware and access `req.auth`
+3. **Matcher Config**: Define which routes to protect using glob patterns
+
+### Implementation
+
+```typescript
+import { NextResponse } from "next/server";
+import { auth } from "@/authConfig";
+
+export default auth((req) => {
+  // If no session → redirect to /login
+  if (!req.auth) {
+    return NextResponse.redirect(new URL("/login", req.nextUrl.origin));
+  }
+  // If session exists → allow access
+  return NextResponse.next();
+});
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/admin/:path*"],
+};
+```
+
+### How It Works
+
+| Scenario | Behavior |
+|----------|----------|
+| User visits `/profile` without session | Middleware redirects to `/login` |
+| User visits `/profile` with valid session | Middleware allows access |
+| User visits `/login` (not in matcher) | Middleware does not run |
+
+### Matcher Patterns
+
+```typescript
+export const config = {
+  matcher: [
+    "/dashboard/:path*",   // Protects /dashboard and all sub-routes
+    "/profile/:path*",     // Protects /profile and all sub-routes  
+    "/admin/:path*",       // Protects /admin and all sub-routes
+    // "/((?!login|api|_next).*)",  // Protect all except login, api, _next
+  ],
+};
+```
+
+### Important Notes
+
+> **File Location**: If your project uses `src/` folder structure, middleware **MUST** be at `src/middleware.ts`, not at the project root.
+
+> **Session Check**: `req.auth` contains the NextAuth session. If `null` or `undefined`, user is not authenticated.
+
+> **Redirect URL**: Use `req.nextUrl.origin` to build absolute URLs for redirects.
+
+## 8. Logout Implementation (`src/app/actions/logout.ts`)
+
+Implement logout using NextAuth v5 server action pattern.
+
+```typescript
+"use server";
+
+import { signOut } from "@/authConfig";
+
+export async function logout() {
+  await signOut({ redirectTo: "/login" });
+}
+```
+
+### Usage in Profile Page
+
+```tsx
+import { auth } from "@/authConfig";
+import { logout } from "../actions/logout";
+
+export default async function ProfilePage() {
+  const session = await auth();
+  // ... parse profile
+
+  return (
+    <div>
+      <h1>Provider Profile</h1>
+      <form action={logout}>
+        <button type="submit">Logout</button>
+      </form>
+      <pre>{JSON.stringify(parsedProfile, null, 2)}</pre>
+    </div>
+  );
+}
+```
+
+### Complete Auth Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        AUTH FLOW                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. User visits /profile                                        │
+│           │                                                     │
+│           ▼                                                     │
+│  2. Middleware checks req.auth                                  │
+│           │                                                     │
+│     ┌─────┴─────┐                                               │
+│     │           │                                               │
+│   No auth    Has auth                                           │
+│     │           │                                               │
+│     ▼           ▼                                               │
+│  Redirect    Allow access                                       │
+│  to /login   to /profile                                        │
+│     │           │                                               │
+│     ▼           ▼                                               │
+│  3. User      4. User clicks                                    │
+│  logs in        Logout                                          │
+│  via Health ID    │                                             │
+│     │           ▼                                               │
+│     │        5. Server action                                   │
+│     │           signOut()                                       │
+│     │           │                                               │
+│     │           ▼                                               │
+│     └────►  6. Redirect to /login                               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
