@@ -7,6 +7,9 @@ const authOptions: NextAuthConfig = {
     strategy: "jwt",
     maxAge: 60 * 60 * 25, // 25 hours
   },
+  pages: {
+    signIn: "/login",
+  },
   providers: [
     CredentialsProvider({
       async authorize(credentials) {
