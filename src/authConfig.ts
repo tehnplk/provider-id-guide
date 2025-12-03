@@ -3,6 +3,7 @@ import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const authOptions: NextAuthConfig = {
+  trustHost: true,
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 25, // 25 hours
@@ -24,6 +25,10 @@ const authOptions: NextAuthConfig = {
     }),
   ],
   callbacks: {
+    authorized: async ({ auth }) => {
+      // ถ้ามี session (auth) = ผ่าน, ถ้าไม่มี = redirect ไป signIn page
+      return !!auth;
+    },
     async jwt({ token, user }: { token: JWT; user?: any }) {
       if (user) {
         (token as any).profile = (user as any).profile;
