@@ -402,3 +402,215 @@ export default async function ProfilePage() {
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+## 9. Profile Structure from auth session
+
+### auth seesion profile Structure
+
+```json
+{
+    "account_id": "133478xxxx74075",
+    "hash_cid": "4e060f4f64085f66eea56aa85497849b16875d7f56a44af8c73f5a7523c3a0c3",
+    "provider_id": "0B3xxxxx5487",
+    "title_th": "นาย",
+    "special_title_th": "อื่นๆ",
+    "name_th": "อุเทน xxxxxx",
+    "name_eng": "Utehn xxxxxx",
+    "created_at": "2024-02-29T05:44:52.000Z",
+    "title_en": "Mr.",
+    "special_title_en": "Other",
+    "firstname_th": "อุเทน",
+    "lastname_th": "xxxxxx",
+    "firstname_en": "Utehn",
+    "lastname_en": "xxxxxx",
+    "email": "xxxxxx@gmail.com",
+    "date_of_birth": "1980-04-18",
+    "organization": [
+      {
+        "business_id": "435750xxxxx32484360",
+        "position": "นักวิชาการสาธารณสุข",
+        "position_id": "0011",
+        "affiliation": "นักวิชาการสาธารณสุข",
+        "license_id": null,
+        "hcode": "00051",
+        "code9": "000005100",
+        "hcode9": "AA0000051",
+        "level": "3",
+        "hname_th": "สำนักงานสาธารณสุขจังหวัดxxxxx",
+        "hname_eng": "Provincial Public Health Office",
+        "tax_id": "28855562xxxxx0792",
+        "license_expired_date": null,
+        "license_id_verify": false,
+        "expertise": null,
+        "expertise_id": null,
+        "moph_station_ref_code": null,
+        "is_private_provider": false,
+        "address": {
+          "address": null,
+          "moo": null,
+          "building": null,
+          "soi": null,
+          "street": null,
+          "province": "พิษณุโลก",
+          "district": "เมืองพิษณุโลก",
+          "sub_district": "ในเมือง",
+          "zip_code": "65000"
+        },
+        "position_type": "นักวิชาการสาธารณสุข"
+      }
+    ]
+}
+
+```
+
+### Profile Fields Description
+
+#### Root Level Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `account_id` | string | รหัสบัญชีผู้ใช้ |
+| `hash_cid` | string | เลขบัตรประชาชนที่ถูก hash (SHA-256) |
+| `provider_id` | string | รหัส Provider ID |
+| `title_th` | string | คำนำหน้าชื่อ (ภาษาไทย) |
+| `special_title_th` | string | คำนำหน้าพิเศษ (ภาษาไทย) |
+| `name_th` | string | ชื่อ-นามสกุล (ภาษาไทย) |
+| `name_eng` | string | ชื่อ-นามสกุล (ภาษาอังกฤษ) |
+| `created_at` | string | วันที่สร้างบัญชี (ISO 8601) |
+| `title_en` | string | คำนำหน้าชื่อ (ภาษาอังกฤษ) |
+| `special_title_en` | string | คำนำหน้าพิเศษ (ภาษาอังกฤษ) |
+| `firstname_th` | string | ชื่อ (ภาษาไทย) |
+| `lastname_th` | string | นามสกุล (ภาษาไทย) |
+| `firstname_en` | string | ชื่อ (ภาษาอังกฤษ) |
+| `lastname_en` | string | นามสกุล (ภาษาอังกฤษ) |
+| `email` | string | อีเมล |
+| `date_of_birth` | string | วันเกิด (YYYY-MM-DD) |
+| `organization` | array | รายการหน่วยงานที่สังกัด |
+
+#### Organization Object Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `business_id` | string | รหัสธุรกิจ/หน่วยงาน |
+| `position` | string | ตำแหน่ง |
+| `position_id` | string | รหัสตำแหน่ง |
+| `affiliation` | string | สังกัด |
+| `license_id` | string \| null | เลขที่ใบอนุญาต |
+| `hcode` | string | รหัสสถานพยาบาล (5 หลัก) |
+| `code9` | string | รหัสสถานพยาบาล (9 หลัก) |
+| `hcode9` | string | รหัสสถานพยาบาล (รูปแบบ AA) |
+| `level` | string | ระดับหน่วยงาน |
+| `hname_th` | string | ชื่อหน่วยงาน (ภาษาไทย) |
+| `hname_eng` | string | ชื่อหน่วยงาน (ภาษาอังกฤษ) |
+| `tax_id` | string | เลขประจำตัวผู้เสียภาษี |
+| `license_expired_date` | string \| null | วันหมดอายุใบอนุญาต |
+| `license_id_verify` | boolean | สถานะการยืนยันใบอนุญาต |
+| `expertise` | string \| null | ความเชี่ยวชาญ |
+| `expertise_id` | string \| null | รหัสความเชี่ยวชาญ |
+| `moph_station_ref_code` | string \| null | รหัสอ้างอิงสถานี สธ. |
+| `is_private_provider` | boolean | เป็นผู้ให้บริการเอกชนหรือไม่ |
+| `address` | object | ที่อยู่หน่วยงาน |
+| `position_type` | string | ประเภทตำแหน่ง |
+
+#### Address Object Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `address` | string \| null | ที่อยู่ |
+| `moo` | string \| null | หมู่ |
+| `building` | string \| null | อาคาร |
+| `soi` | string \| null | ซอย |
+| `street` | string \| null | ถนน |
+| `province` | string | จังหวัด |
+| `district` | string | อำเภอ/เขต |
+| `sub_district` | string | ตำบล/แขวง |
+| `zip_code` | string | รหัสไปรษณีย์ |
+
+### TypeScript Interface
+
+```typescript
+interface ProviderProfile {
+  account_id: string;
+  hash_cid: string;
+  provider_id: string;
+  title_th: string;
+  special_title_th: string;
+  name_th: string;
+  name_eng: string;
+  created_at: string;
+  title_en: string;
+  special_title_en: string;
+  firstname_th: string;
+  lastname_th: string;
+  firstname_en: string;
+  lastname_en: string;
+  email: string;
+  date_of_birth: string;
+  organization: Organization[];
+}
+
+interface Organization {
+  business_id: string;
+  position: string;
+  position_id: string;
+  affiliation: string;
+  license_id: string | null;
+  hcode: string;
+  code9: string;
+  hcode9: string;
+  level: string;
+  hname_th: string;
+  hname_eng: string;
+  tax_id: string;
+  license_expired_date: string | null;
+  license_id_verify: boolean;
+  expertise: string | null;
+  expertise_id: string | null;
+  moph_station_ref_code: string | null;
+  is_private_provider: boolean;
+  address: Address;
+  position_type: string;
+}
+
+interface Address {
+  address: string | null;
+  moo: string | null;
+  building: string | null;
+  soi: string | null;
+  street: string | null;
+  province: string;
+  district: string;
+  sub_district: string;
+  zip_code: string;
+}
+
+interface ProviderProfileResponse {
+  status: boolean;
+  message: string;
+  data: ProviderProfile;
+}
+```
+
+### Usage Example
+
+```typescript
+// Parse profile from session
+const session = await auth();
+const rawProfile = (session?.user as any)?.profile as string | undefined;
+
+if (rawProfile) {
+  const profile: ProviderProfile = JSON.parse(rawProfile);
+  
+  console.log(`ชื่อ: ${profile.title_th}${profile.firstname_th} ${profile.lastname_th}`);
+  console.log(`Provider ID: ${profile.provider_id}`);
+  console.log(`อีเมล: ${profile.email}`);
+  
+  // แสดงข้อมูลหน่วยงาน
+  profile.organization.forEach((org, index) => {
+    console.log(`หน่วยงานที่ ${index + 1}: ${org.hname_th}`);
+    console.log(`  ตำแหน่ง: ${org.position}`);
+    console.log(`  รหัสสถานพยาบาล: ${org.hcode}`);
+    console.log(`  ที่อยู่: ${org.address.district}, ${org.address.province}`);
+  });
+}
+```
