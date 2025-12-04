@@ -256,15 +256,23 @@ export default async function ProfilePage() {
 }
 ```
 
-## 7. Route Protection with Middleware (`src/middleware.ts`)
+## 7. Route Protection with Proxy (`src/proxy.ts`)
 
-Protect routes using Next.js middleware with NextAuth v5. This ensures unauthenticated users are redirected to the login page.
+> **Note (Next.js 16+)**: The `middleware` file convention is deprecated and has been renamed to `proxy`. See [Migration to Proxy](https://nextjs.org/docs/messages/middleware-to-proxy) for more details.
+
+Protect routes using Next.js proxy with NextAuth v5. This ensures unauthenticated users are redirected to the login page.
 
 ### Key Concepts
 
-1. **Middleware Location**: For projects using `src/` folder, middleware must be at `src/middleware.ts` (not root)
-2. **Auth Wrapper**: Use `auth()` from NextAuth to wrap middleware and access `req.auth`
+1. **Proxy Location**: For projects using `src/` folder, proxy must be at `src/proxy.ts` (not root)
+2. **Auth Wrapper**: Use `auth()` from NextAuth to wrap proxy and access `req.auth`
 3. **Matcher Config**: Define which routes to protect using glob patterns
+
+### Why the Change from Middleware to Proxy
+
+- The term "middleware" was often confused with Express.js middleware
+- The name "Proxy" clarifies that it operates at a network boundary in front of the app
+- Next.js recommends using Proxy as a last resort, preferring other APIs when possible
 
 ### Implementation
 
@@ -290,9 +298,9 @@ export const config = {
 
 | Scenario | Behavior |
 |----------|----------|
-| User visits `/profile` without session | Middleware redirects to `/login` |
-| User visits `/profile` with valid session | Middleware allows access |
-| User visits `/login` (not in matcher) | Middleware does not run |
+| User visits `/profile` without session | Proxy redirects to `/login` |
+| User visits `/profile` with valid session | Proxy allows access |
+| User visits `/login` (not in matcher) | Proxy does not run |
 
 ### Matcher Patterns
 
@@ -309,11 +317,21 @@ export const config = {
 
 ### Important Notes
 
-> **File Location**: If your project uses `src/` folder structure, middleware **MUST** be at `src/middleware.ts`, not at the project root.
+> **File Location**: If your project uses `src/` folder structure, proxy **MUST** be at `src/proxy.ts`, not at the project root.
 
 > **Session Check**: `req.auth` contains the NextAuth session. If `null` or `undefined`, user is not authenticated.
 
 > **Redirect URL**: Use `req.nextUrl.origin` to build absolute URLs for redirects.
+
+### Migration from Middleware
+
+Next.js provides a codemod to migrate automatically:
+
+```bash
+npx @next/codemod@canary middleware-to-proxy .
+```
+
+Or manually rename `middleware.ts` to `proxy.ts`. The `auth()` wrapper from NextAuth v5 continues to work the same way.
 
 ## 8. Logout Implementation (`src/app/actions/logout.ts`)
 
@@ -361,7 +379,7 @@ export default async function ProfilePage() {
 │  1. User visits /profile                                        │
 │           │                                                     │
 │           ▼                                                     │
-│  2. Middleware checks req.auth                                  │
+│  2. Proxy checks req.auth                                       │
 │           │                                                     │
 │     ┌─────┴─────┐                                               │
 │     │           │                                               │
